@@ -15,11 +15,15 @@ user_matt = User.query.filter_by(name='matt').first()
 print(user_matt)
 
 #### update
-user_bryce = User.query.filter_by(name='Bryce').first()
-user_bryce.email = 'therealdeal@gmail.com'
-db.session.add(user_bryce)
+# user_bryce = User.query.filter_by(email='therealdeal@gmail.com')
+# user_bryce.name = 'Brydog'
+# db.session.add(user_bryce)
+# db.session.commit()
+# print(user_bryce)
+
+person = User.query.filter_by(email='ryan@pusd.com')
+person.name = 'coolkid'
 db.session.commit()
-print(user_bryce)
 
 #### delete
 user_john = User.query.filter_by(name='john').first()

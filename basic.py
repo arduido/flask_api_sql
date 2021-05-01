@@ -1,8 +1,9 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_restful import Resource, Api
+import jinja2
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
@@ -14,6 +15,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 Migrate(app,db)
 api = Api(app)
+
+
+@app.route("/")
+def template_test():
+    users = User.query.all()
+    print(users)
+    return render_template('layout.html', users=users)
+
 # ======================setting up the db ===================
 
 
@@ -31,7 +40,13 @@ class User(db.Model):
         self.dob = dob
 
     def json(self):
-        return f"{self.name} your username is: {self.email}"
+        return {
+            "name": self.name ,
+            "email": self.email,
+            "dob": self.dob
+        }
+
+        # return f"{self.name} your username is: {self.email} and DOB is {self.dob}"
 
     class UserNames(Resource):
 
@@ -49,7 +64,16 @@ class User(db.Model):
             person = User.query.filter_by(name=name).first()
             db.session.delete(person)
             db.session.commit()
-    
+
+
+    class ChangeUserName(Resource):
+
+        def put(self, name, email):
+            person = User.query.filter_by(email=email)
+            person.update(dict(name=name))
+            db.session.commit()
+
+
     class CreateUser(Resource):
 
         def post(self, name, email, dob):
@@ -68,6 +92,7 @@ class User(db.Model):
     
     api.add_resource(UserNames, '/name/<string:name>')
     api.add_resource(CreateUser, '/create/<string:name>/<string:email>/<string:dob>')
+    api.add_resource(ChangeUserName, '/update/<string:email>/<string:name>')
     api.add_resource(AllUsers, '/users')
 
 if __name__ == '__main__':

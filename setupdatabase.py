@@ -9,4 +9,4 @@ db.session.add_all([matt,john])
 
 db.session.commit()
 
-print(matt.email)
+# print(matt.email)
